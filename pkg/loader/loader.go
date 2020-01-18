@@ -2,64 +2,72 @@ package loader
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
 
-func Load(filename string) ([]string, []string) {
+func Load(filename string) ([]string, []string, error) {
+	var config, lines []string
+
 	file, err := os.Open(filename)
-	if file == nil {
-		log.Fatal(err)
+	if err != nil {
+		return config, lines, err
 	}
 
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
-	config := loadConfig(reader, file)
-	lines := loadData(reader)
-
-	return config, lines
-}
-
-func LoadFilesToProcess() []string {
-	files, err := ioutil.ReadDir("./input")
+	config, err = loadConfig(reader)
 	if err != nil {
-		log.Fatal(err)
+		return config, lines, err
 	}
 
+	lines, err = loadData(reader)
+
+	return config, lines, err
+}
+
+func LoadFilesToProcess() ([]string, error) {
 	var fileNames []string
+
+	files, err := ioutil.ReadDir("./input")
+	if err != nil {
+		return fileNames, err
+	}
+
 	for _, file := range files {
 		fileNames = append(fileNames, file.Name())
 	}
 
-	return fileNames
+	return fileNames, err
 }
 
-func loadConfig(reader *bufio.Reader, file *os.File) []string {
+func loadConfig(reader *bufio.Reader) ([]string, error) {
+	var configArr []string
+
 	config, err := reader.ReadString('\n')
 	if err != nil {
-		log.Fatal(err)
+		return configArr, err
 	}
 
 	config = strings.Replace(config, "\n", "", -1)
-
 	if config == "" {
-		log.Fatal("Could not read config from file: " + file.Name())
+		return configArr, errors.New("config can not be empty")
 	}
-	configArr := strings.Split(config, " ")
+	configArr = strings.Split(config, " ")
 
-	return configArr
+	return configArr, err
 }
 
-func loadData(reader *bufio.Reader) []string {
+func loadData(reader *bufio.Reader) ([]string, error) {
 	var lines []string
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil && err != io.EOF {
-			log.Fatal(err)
+			return lines, err
 		}
 
 		line = strings.Replace(line, "\n", "", -1)
@@ -73,5 +81,5 @@ func loadData(reader *bufio.Reader) []string {
 		}
 	}
 
-	return lines
+	return lines, nil
 }

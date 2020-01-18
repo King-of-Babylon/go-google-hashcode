@@ -7,13 +7,24 @@ import (
 )
 
 func main() {
-    filenames := loader.LoadFilesToProcess()
+    filenames, err := loader.LoadFilesToProcess()
+    handleError(err)
 
     for _, filename := range filenames {
-        config, data := loader.Load("./input/" + filename)
+        config, data, err := loader.Load("./input/" + filename)
+        handleError(err)
+
         result := processor.Process(config, data)
-        writer.Write(result, filename)
+        err = writer.Write(result, filename)
+        handleError(err)
     }
 
-    writer.Zip()
+    err = writer.Zip()
+    handleError(err)
+}
+
+func handleError(err error) {
+    if err != nil {
+        panic(err)
+    }
 }
