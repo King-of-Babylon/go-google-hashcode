@@ -2,4 +2,4 @@
 
 # Installation
 
-* Clone into your $GOPATH/src/github.com/King-of-Babylon/hashcode2020
+* Go get github.com/King-of-Babylon/go-google-hashcode

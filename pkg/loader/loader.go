@@ -25,7 +25,7 @@ func Load(filename string) ([]string, []string) {
 }
 
 func LoadFilesToProcess() []string {
-	files, err := ioutil.ReadDir("./src")
+	files, err := ioutil.ReadDir("./input")
 	if err != nil {
 		log.Fatal(err)
 	}
